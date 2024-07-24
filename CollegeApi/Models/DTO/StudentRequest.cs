@@ -1,14 +1,12 @@
-﻿using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations;
 
-namespace CollegeApi.Models
+namespace CollegeApi.Models.DTO
 {
-    public class Student
+    public class StudentRequest
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+      
 
         [Required]
         [StringLength(100, MinimumLength = 2)]
@@ -35,22 +33,13 @@ namespace CollegeApi.Models
         [StringLength(50)]
         public string Country { get; set; }
 
-        
         public string PostalCode { get; set; }
-
-        [Required]
-        public string EnrollmentNumber { get; set; }
-
-        
+        [BsonId]
         [Required]
         public string CollegeId { get; set; }
 
-        [Range(0, 4.0, ErrorMessage = "GPA must be between 0 and 4.0")]
-        public double GPA { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
 
-       
-      
+
     }
 }

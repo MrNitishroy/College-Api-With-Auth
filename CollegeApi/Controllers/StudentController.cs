@@ -1,4 +1,5 @@
 ﻿using CollegeApi.Models;
+using CollegeApi.Models.DTO;
 using CollegeApi.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -40,7 +41,7 @@ namespace CollegeApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<IActionResult> CreateStudent([FromBody] Student student)
+        public async Task<IActionResult> CreateStudent([FromBody] StudentRequest student)
         {
             var newStudent = await studentService.CreateStudent(student);
             if(collegeService.GetCollegeById(student.CollegeId) == null)
@@ -50,8 +51,8 @@ namespace CollegeApi.Controllers
             await collegeService.IncreaseStudentCount(student.CollegeId);
             return Ok(newStudent);
         }
-        [HttpPost("many-create")]
-        public async Task<IActionResult> AddBulkStudent([FromBody] List<Student> students)
+        [HttpPost("create-bulk")]
+        public async Task<IActionResult> AddBulkStudent([FromBody] List<StudentRequest> students)
         {
             var newStudents = await studentService.AddBulkStudent(students);
             return Ok(newStudents);

@@ -1,7 +1,10 @@
 ﻿using CollegeApi.Models;
+using CollegeApi.Models.DTO;
 using CollegeApi.MongoSettings;
 using CollegeApi.Services.Interface;
+using MongoDB.Bson;
 using MongoDB.Driver;
+using System.Text.RegularExpressions;
 
 namespace CollegeApi.Services
 {
@@ -45,13 +48,61 @@ namespace CollegeApi.Services
             }
             return await _students.Find(filter).ToListAsync();
         }
-        public async Task<Student> CreateStudent(Student student)
+        public async Task<Student> CreateStudent(StudentRequest studentReq)
         {
+            var enrollmentNumber = await GenerateEnrollmentNumber(studentReq.Name);
+            var student = new Student
+            {
+                Name = studentReq.Name,
+                Age = studentReq.Age,
+                City = studentReq.City,
+                CollegeId = studentReq.CollegeId,
+                EnrollmentNumber = enrollmentNumber,
+                Address = studentReq.Address,
+                Country = studentReq.Country,
+                Email = studentReq.Email,
+                Number = studentReq.Number,
+                PostalCode = studentReq.PostalCode
+
+            };
             await _students.InsertOneAsync(student);
             return student;
         }
-        public async Task<List<Student>> AddBulkStudent(List<Student> students)
+        //public async Task<List<Student>> AddBulkStudent(List<Student> students)
+        //{
+        //    await _students.InsertManyAsync(students);
+        //    return students;
+        //}
+        public async Task<List<Student>> AddBulkStudent(List<StudentRequest> studentRequests)
         {
+            var students = new List<Student>();
+
+            foreach (var studentReq in studentRequests)
+            {
+                try
+                {
+                    var enrollmentNumber = await GenerateEnrollmentNumber(studentReq.Name);
+                    var student = new Student
+                    {
+                        Name = studentReq.Name,
+                        Age = studentReq.Age,
+                        City = studentReq.City,
+                        CollegeId = studentReq.CollegeId,
+                        EnrollmentNumber = enrollmentNumber,
+                        Address = studentReq.Address,
+                        Country = studentReq.Country,
+                        Email = studentReq.Email,
+                        Number = studentReq.Number,
+                        PostalCode = studentReq.PostalCode
+                    };
+                    students.Add(student);
+                }
+                catch (Exception ex)
+                {
+                    // Log the exception or handle it as needed
+                    // For example: _logger.LogError(ex, "Failed to process student request.");
+                }
+            }
             await _students.InsertManyAsync(students);
             return students;
         }
@@ -64,6 +115,27 @@ namespace CollegeApi.Services
         {
             return await _students.FindOneAndDeleteAsync(s => s.Id == id);
         }
+        private async Task<string> GenerateEnrollmentNumber(string name)
+        {
+            // Extract initials from the name
+            string initials = new string(name.Split(' ').Select(n => n[0]).ToArray()).ToUpper();
 
+            // Find the current highest order number for students with the same initials
+            var filter = Builders<Student>.Filter.Regex("EnrollmentNumber", new BsonRegularExpression($"^{initials}"));
+            var lastStudentWithInitials = await _students.Find(filter)
+                                                         .SortByDescending(s => s.EnrollmentNumber)
+                                                         .FirstOrDefaultAsync();
+
+            int orderNumber = 1;
+            if (lastStudentWithInitials != null)
+            {
+                string lastEnrollmentNumber = lastStudentWithInitials.EnrollmentNumber;
+                string orderNumberStr = Regex.Match(lastEnrollmentNumber, @"\d+$").Value;
+                orderNumber = int.Parse(orderNumberStr) + 1;
+            }
+
+            // Generate new enrollment number
+            return $"{initials}{orderNumber:D2}";
+        }
     }
 }
