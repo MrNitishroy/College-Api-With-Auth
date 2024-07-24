@@ -5,12 +5,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CollegeApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/colleges")]
     [ApiController]
-    public class CollegeController : ControllerBase
+    public class CollegesController : ControllerBase
     {
         private readonly ICollegeService collegeService;
-        public CollegeController(ICollegeService collegeService)
+        public CollegesController(ICollegeService collegeService)
         {
             this.collegeService = collegeService;
         }
