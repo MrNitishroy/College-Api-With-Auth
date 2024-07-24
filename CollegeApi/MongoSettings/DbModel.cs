@@ -6,5 +6,6 @@
         public string Database { get; set; }
         public string StudentsDb { get; set; }
         public string CollegesDb { get; set; }
+        public string UsersDb { get; set; }
     }
 }

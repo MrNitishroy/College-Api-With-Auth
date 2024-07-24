@@ -1,5 +1,5 @@
 ﻿using CollegeApi.Models;
-using CollegeApi.Models.DTO;
+using CollegeApi.Models.Request;
 
 namespace CollegeApi.Services.Interface
 {

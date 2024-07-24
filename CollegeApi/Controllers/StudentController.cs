@@ -1,5 +1,5 @@
 ﻿using CollegeApi.Models;
-using CollegeApi.Models.DTO;
+using CollegeApi.Models.Request;
 using CollegeApi.Services.Interface;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

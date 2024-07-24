@@ -8,6 +8,7 @@ namespace CollegeApi.MongoSettings
     {
         private readonly IMongoCollection<Student> _students;
         private readonly IMongoCollection<College> _colleges;
+        private readonly IMongoCollection<User> _users;
 
         public DbContext(IOptions<DbModel> dbModel)
         {
@@ -17,9 +18,11 @@ namespace CollegeApi.MongoSettings
 
             _students = database.GetCollection<Student>(dbModel.Value.StudentsDb);
             _colleges = database.GetCollection<College>(dbModel.Value.CollegesDb);
+            _users = database.GetCollection<User>(dbModel.Value.UsersDb);
         }
 
         public IMongoCollection<Student> Students => _students;
         public IMongoCollection<College> Colleges => _colleges;
+        public IMongoCollection<User> Users => _users;
     }
 }

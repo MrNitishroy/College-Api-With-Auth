@@ -16,6 +16,7 @@ builder.Services.AddSingleton<DbContext>();
 
 builder.Services.AddTransient<IStudentService, StudentService>();
 builder.Services.AddTransient<ICollegeService, CollegeService>();
+builder.Services.AddTransient<IUserService, UserService>(); 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

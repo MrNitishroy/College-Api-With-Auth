@@ -2,11 +2,11 @@
 using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations;
 
-namespace CollegeApi.Models.DTO
+namespace CollegeApi.Models.Request
 {
     public class StudentRequest
     {
-      
+
 
         [Required]
         [StringLength(100, MinimumLength = 2)]
