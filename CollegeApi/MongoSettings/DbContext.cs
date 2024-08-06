@@ -20,6 +20,8 @@ namespace CollegeApi.MongoSettings
             _colleges = database.GetCollection<College>(dbModel.Value.CollegesDb);
             _users = database.GetCollection<User>(dbModel.Value.UsersDb);
             authKey = configuration.GetSection("JwtConfig").ToString();
+            var databaseValid = new DatabaseValid(database);
+            databaseValid.Initialize();
         }
 
         public IMongoCollection<Student> Students => _students;

@@ -2,25 +2,24 @@ using CollegeApi.MongoSettings;
 using CollegeApi.Services.Interface;
 using CollegeApi.Services;
 using Microsoft.OpenApi.Models;
+using Microsoft.AspNetCore.Authentication;
+using CollegeApi.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(opt =>
 {
-    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "MyAPI", Version = "v1" });
-    opt.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    opt.SwaggerDoc("v1", new OpenApiInfo { Title = "College Api", Version = "v1" });
+    opt.AddSecurityDefinition("basic", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
         Description = "Please enter token",
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        Scheme = "bearer"
+        Scheme = "basic"
     });
     opt.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
@@ -30,7 +29,7 @@ builder.Services.AddSwaggerGen(opt =>
                 Reference = new OpenApiReference
                 {
                     Type=ReferenceType.SecurityScheme,
-                    Id="Bearer"
+                    Id="basic"
                 }
             },
             new string[]{}
@@ -38,12 +37,13 @@ builder.Services.AddSwaggerGen(opt =>
     });
 });
 builder.Services.Configure<DbModel>(builder.Configuration.GetSection("MongoDBConfig"));
-// Register DbContext as a singleton service
 builder.Services.AddSingleton<DbContext>();
-
+builder.Services.AddAuthentication("BasicAuthentication")
+    .AddScheme<AuthenticationSchemeOptions, BasicAuthHandler>("BasicAuthentication", null);
 builder.Services.AddTransient<IStudentService, StudentService>();
 builder.Services.AddTransient<ICollegeService, CollegeService>();
-builder.Services.AddTransient<IUserService, UserService>(); 
+builder.Services.AddTransient<IUserService, UserService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -54,9 +54,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapControllers();
 

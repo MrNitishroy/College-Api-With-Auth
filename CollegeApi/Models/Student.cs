@@ -35,7 +35,6 @@ namespace CollegeApi.Models
         [StringLength(50)]
         public string Country { get; set; }
 
-        
         public string PostalCode { get; set; }
 
         [Required]

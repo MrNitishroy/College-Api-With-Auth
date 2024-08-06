@@ -1,50 +1,26 @@
-﻿using CollegeApi.Models.Request;
-using CollegeApi.Services.Interface;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 
 namespace CollegeApi.Controllers
 {
-    [AllowAnonymous]
-    [Route("api/[controller]")]
+    [Route("auth")]
     [ApiController]
-    public class AuthControlller : ControllerBase
+    public class AuthController : ControllerBase
     {
-        private readonly IUserService userService;
-        public AuthControlller(IUserService userService)
+        // This endpoint checks the authentication status.
+        [Authorize]
+        [HttpGet("status", Name = "AuthStatus")]
+        public ActionResult AuthStatus()
         {
-            this.userService = userService;
+            return Ok(new { Message = "Authenticated", User = User.Identity.Name });
         }
 
-        [HttpPost("authenticate")]
-        public async Task<IActionResult> AuthenticateUser([FromBody] UserRequest userRequest)
+        // Optionally, you can add a public endpoint to test access without authentication.
+        [AllowAnonymous]
+        [HttpGet("public")]
+        public ActionResult PublicEndpoint()
         {
-            var user = await userService.AuthenticateUser(userRequest);
-            if (user == null)
-            {
-                return BadRequest("Invalid email or password");
-            }
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenKey = Encoding.ASCII.GetBytes("a much longer and more secure key with at least 32 bytes"); // Updated key
-            var tokenDescriptor = new SecurityTokenDescriptor()
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-            new Claim(ClaimTypes.Email, userRequest.Email),
-                }),
-                Expires = DateTime.UtcNow.AddHours(1),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(tokenKey), SecurityAlgorithms.HmacSha256Signature),
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return Ok(tokenHandler.WriteToken(token));
+            return Ok(new { Message = "This is a public endpoint accessible without authentication." });
         }
-
     }
 }

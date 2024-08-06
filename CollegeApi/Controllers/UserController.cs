@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CollegeApi.Controllers
 {
-    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
